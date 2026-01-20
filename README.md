@@ -11,7 +11,7 @@ Interlat: Enabling Agents to Communicate Entirely in Latent Space
 
 ## 💡 Introduction
 
-**Interlat** is a groundbreaking multi-agent communication framework that enables agents to collaborate **entirely in latent space**, bypassing natural language as the communication medium. Instead of transmitting discrete tokens or chain-of-thought plans, agents directly share their **last-layer hidden states** as representations of internal thoughts, allowing richer, more information-preserving interaction.
+**Interlat** is a novel multi-agent communication framework that enables agents to collaborate **entirely in latent space**, bypassing natural language as the communication medium. Instead of transmitting discrete tokens or chain-of-thought plans, agents directly share their **last-layer hidden states** as representations of internal thoughts, allowing richer, more information-preserving interaction.
 
 Interlat introduces a principled approach to latent communication with the following key features:
 
