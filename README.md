@@ -25,61 +25,11 @@ Overall, Interlat demonstrates that **latent space can serve as a high-bandwidth
 
 <p align="center"><img src="assets/interlat.png" width="1000"></p>
 
-## 🚀 Quick Start Pipeline
-
-**Interlat follows a simple 3-step workflow:**
-
-```mermaid
-graph LR
-    A[📊 Data Collection] --> B[🧠 Model Training] --> C[🎯 Evaluation]
-    A1[Hidden States] --> A
-    B1[Latent Integration] --> B
-    C1[Task Performance] --> C
-```
-
-### 📋 Complete Workflow Overview
-
-1. **📊 Data Collection** — Extract hidden states from language models on your target tasks
-   ```bash
-   # Collect ALFWorld hidden states
-   ./scripts/collect_alfworld.sh --dataset_path ./data/alfworld_dataset.json
-
-   # Collect Math reasoning hidden states
-   ./scripts/collect_math.sh --subjects algebra geometry
-   ```
-
-2. **🧠 Model Training** — Train models with hidden state integration for latent communication
-   ```bash
-   # Train with collected hidden states
-   ./scripts/train_model.sh --model Qwen/Qwen2.5-7B --data ./data/train.json
-
-   # Train compressed latent models (optional)
-   ./scripts/train_compression.sh --teacher-model ./trained_models --K 128
-   ```
-
-3. **🎯 Evaluation** — Test your trained models on downstream tasks
-   ```bash
-   # Evaluate on ALFWorld tasks
-   python eval/alfworld/eval_agent/main.py --model_path ./trained_models --dataset_path ./data/hidden_states
-
-   # Evaluate on Math reasoning
-   python eval/math/math_evaluator.py --model_name ./trained_models --dataset hendrycks/MATH
-   ```
-
-**🎬 One-Command Demo:**
-```bash
-# Complete pipeline with ALFWorld (recommended for first-time users)
-./scripts/quick_start.sh
-
-# Complete pipeline with Math reasoning
-./scripts/quick_start.sh --task math --full
-```
-
 ---
 
 ## 🔔 News
 
-- **[2026-1-15]** We have released our code implementations for Interlat!
+- **[2026-1-20]** We have released our code implementations for Interlat!
 
 ---
 
