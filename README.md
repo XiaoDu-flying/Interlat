@@ -296,12 +296,6 @@ python eval/math/math_evaluator.py \
     --output_dir ./eval_results/math
 ```
 
-**Key Features:**
-- Automatic answer normalization and comparison
-- Robust `\boxed{}` answer extraction with nested brace handling
-- Support for multiple samples per question for reliability analysis
-- Comprehensive logging with timestamps and model outputs
-
 ---
 
 ## 🗜️ Latent Compression Training
@@ -408,10 +402,6 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 ---
 
 <div align="center">
-
-⭐ **Star this repository if you find it helpful!** ⭐
-
-**Built with ❤️ for the multi-agent AI research community**
 
 [🔝 Back to Top](#readme-top)
 
