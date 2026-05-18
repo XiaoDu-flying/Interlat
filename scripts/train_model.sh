@@ -145,7 +145,7 @@ echo "Logs will be saved to: $LOG_FILE"
 CMD_ARGS=(
     --model_name_or_path "$MODEL_NAME"
     --data_path "$DATA_PATH"
-    --hidden_data_path "$HIDDEN_DATA"
+    --hidden_data "$HIDDEN_DATA"
     --output_dir "$OUTPUT_DIR"
     --num_train_epochs "$EPOCHS"
     --per_device_train_batch_size "$BATCH_SIZE"

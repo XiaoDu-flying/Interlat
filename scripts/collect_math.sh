@@ -166,14 +166,14 @@ if [[ "$DISTRIBUTED" == "true" ]]; then
     # Run with torchrun for distributed training
     torchrun --nproc_per_node="$NUM_GPUS" \
         --master_port=12346 \
-        data_collection/math_collection_args.py \
+        data_collection/math_collection.py \
         "${CMD_ARGS[@]}" \
         2>&1 | tee "$LOG_FILE"
 else
     echo "Running single-GPU data collection..."
 
     # Run single process
-    python data_collection/math_collection_args.py \
+    python data_collection/math_collection.py \
         "${CMD_ARGS[@]}" \
         2>&1 | tee "$LOG_FILE"
 fi

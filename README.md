@@ -1,4 +1,9 @@
 <a name="readme-top"></a>
+
+<p align="center">
+    <a href="README.md">English</a> | <a href="README_zh.md">中文</a>
+</p>
+
 <h1 align="center">
 Interlat: Enabling Agents to Communicate Entirely in Latent Space
 </h1>
@@ -29,6 +34,7 @@ Overall, Interlat demonstrates that **latent space can serve as a high-bandwidth
 
 ## 🔔 News
 
+- **[2026-4-7]** Our paper has been accepted by ACL 2026!
 - **[2026-1-20]** We have released our code implementations for Interlat!
 
 ---
@@ -172,7 +178,7 @@ python data_collection/collect_data.py alfworld \
 python core_training/train.py \
     --model_name_or_path "Qwen/Qwen2.5-7B-Instruct" \
     --data_path "./data/training_data.json" \
-    --hidden_data_path "./data/hidden_states" \
+    --hidden_data "./data/hidden_states" \
     --output_dir "./trained_models" \
     --num_train_epochs 10
 ```

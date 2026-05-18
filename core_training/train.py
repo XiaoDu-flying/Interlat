@@ -66,16 +66,12 @@ from callbacks import (
 from hidden_model.custom_model import ModelWithInsertedHiddenState
 from data_processor import make_supervised_data_module
 
-os.environ["WANDB_DISABLED"] = "true"
-
 # Optional: if you have a Hugging Face token, you can set it here (not required)
 # os.environ["HF_TOKEN"] = "your_hf_token_here"
 
 IGNORE_TOKEN_ID = LabelSmoother.ignore_index
 IGNORE = -100
 EPS = 1e-8  # Prevent log(0)
-
-print(IGNORE_TOKEN_ID)
 
 seed_value = 42
 np.random.seed(seed_value)
@@ -337,6 +333,10 @@ def train():
     training_args.save_safetensors = False
     training_args.remove_unused_columns = False
     training_args.per_device_train_batch_size = 2
+
+    # Disable wandb by default; users can override via --report_to
+    if not hasattr(training_args, 'report_to') or training_args.report_to == ['none']:
+        training_args.report_to = []
 
     print("🔧 Safely converting model to bfloat16...")
     safe_to_bfloat16(model)

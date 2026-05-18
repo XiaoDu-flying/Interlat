@@ -353,13 +353,6 @@ def preprocess_with_position_tracking(
                         f" #turn = {len(turns) - 1}. (ignored)"
                     )
 
-    debug_mask_for_conversation(
-            conversation=conversation,
-            target=target,
-            tokenizer=tokenizer,
-            ignore_token_id=IGNORE_TOKEN_ID,
-        )
-
     # Other sep_style branches can be added if needed
 
     return dict(

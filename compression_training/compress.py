@@ -70,16 +70,16 @@ from fastchat.conversation import SeparatorStyle
 
 # Import ModelWithInsertedHiddenState - adjust path based on your project structure
 try:
-    from core_training.hidden_model.main_model import ModelWithInsertedHiddenState
+    from core_training.hidden_model.custom_model import ModelWithInsertedHiddenState
 except ImportError:
     try:
-        from ..core_training.hidden_model.main_model import ModelWithInsertedHiddenState
+        from ..core_training.hidden_model.custom_model import ModelWithInsertedHiddenState
     except ImportError:
         # Fallback for different project structures
         import sys
         import os
         sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'core_training', 'hidden_model'))
-        from main_model import ModelWithInsertedHiddenState
+        from custom_model import ModelWithInsertedHiddenState
 
 from callbacks import (
     PreCreateCkptDirCallback,

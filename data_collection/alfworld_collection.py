@@ -6,7 +6,7 @@ This script collects ALFWorld data using a language model, with all parameters
 configurable via command line arguments instead of environment variables.
 
 Usage:
-    python alfworld_collection_args.py --dataset_path ./alfworld_dataset.json --output_dir ./output
+    python alfworld_collection.py --dataset_path ./alfworld_dataset.json --output_dir ./output
 """
 
 import torch

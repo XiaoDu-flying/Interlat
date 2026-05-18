@@ -245,7 +245,7 @@ MODEL_OUTPUT_DIR="$EXPERIMENT_DIR/trained_model"
 python core_training/train.py \
     --model_name_or_path "$MODEL_NAME" \
     --data_path "$TRAINING_DATA" \
-    --hidden_data_path "$HIDDEN_DATA_DIR" \
+    --hidden_data "$HIDDEN_DATA_DIR" \
     --output_dir "$MODEL_OUTPUT_DIR" \
     --num_train_epochs "$EPOCHS" \
     --per_device_train_batch_size 2 \

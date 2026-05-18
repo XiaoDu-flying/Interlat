@@ -112,7 +112,7 @@ if [[ "$DISTRIBUTED" == "true" ]]; then
     # Run with torchrun for distributed training
     torchrun --nproc_per_node="$NUM_GPUS" \
         --master_port=12345 \
-        data_collection/alfworld_collection_args.py \
+        data_collection/alfworld_collection.py \
         --model_path "$MODEL_PATH" \
         --dataset_path "$DATASET_PATH" \
         --output_dir "$OUTPUT_DIR" \
@@ -125,7 +125,7 @@ else
     echo "Running single-GPU data collection..."
 
     # Run single process
-    python data_collection/alfworld_collection_args.py \
+    python data_collection/alfworld_collection.py \
         --model_path "$MODEL_PATH" \
         --dataset_path "$DATASET_PATH" \
         --output_dir "$OUTPUT_DIR" \
