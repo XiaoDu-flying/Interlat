@@ -283,20 +283,36 @@ class ModelWithInsertedHiddenState(nn.Module):
         return result
 
     def cross_gpu_negatives(self, prepended_hidden_states):
-        local = [h.detach().cpu() for h in prepended_hidden_states]
-        if not (dist.is_available() and dist.is_initialized()):
-            return None
+        local_pairs = [
+            (idx, h.detach().cpu())
+            for idx, h in enumerate(prepended_hidden_states)
+            if h is not None
+        ]
+        if not local_pairs:
+            return [None] * len(prepended_hidden_states)
 
-        all_lists = [None] * dist.get_world_size()
-        dist.all_gather_object(all_lists, local)
-        pool = []
-        for lst in all_lists:
-            pool.extend(lst)
+        if dist.is_available() and dist.is_initialized():
+            local = [h for _, h in local_pairs]
+            all_lists = [None] * dist.get_world_size()
+            dist.all_gather_object(all_lists, local)
+            pool = []
+            for lst in all_lists:
+                pool.extend(lst)
+        else:
+            pool = [h for _, h in local_pairs]
 
         negs = []
-        for _ in range(len(prepended_hidden_states)):
-            idx = torch.randint(0, len(pool), (1,)).item()
-            negs.append(pool[idx].to(prepended_hidden_states[0].device))
+        for sample_idx, hidden_state in enumerate(prepended_hidden_states):
+            if hidden_state is None:
+                negs.append(None)
+                continue
+
+            candidates = pool
+            if not (dist.is_available() and dist.is_initialized()) and len(local_pairs) > 1:
+                candidates = [h for idx, h in local_pairs if idx != sample_idx]
+
+            choice = torch.randint(0, len(candidates), (1,)).item()
+            negs.append(candidates[choice].to(hidden_state.device))
         return negs
 
     def _forward_with_hidden_states_curriculum(
@@ -551,6 +567,8 @@ class ModelWithInsertedHiddenState(nn.Module):
         random_hidden_states = negs
 
         for i in range(len(random_hidden_states)):
+            if random_hidden_states[i] is None or prepended_hidden_states[i] is None:
+                continue
             hidden_state_len = prepended_hidden_states[i].size(0)
             if random_hidden_states[i].size(0) >= hidden_state_len:
                 random_hidden_states[i] = random_hidden_states[i][:hidden_state_len]

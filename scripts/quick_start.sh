@@ -212,28 +212,56 @@ echo "📁 Hidden states saved to: $HIDDEN_DATA_DIR"
 # Step 3: Training Data Preparation
 print_step "3" "Training Data Preparation"
 
-# For this demo, we'll create a simple training data file
-# In practice, you would prepare this based on your specific task requirements
 TRAINING_DATA="$EXPERIMENT_DIR/training_data.json"
 
-# Create a minimal training data file for demonstration
-cat > "$TRAINING_DATA" << EOF
-[
-    {
-        "id": "demo_1",
-        "conversations": [
-            {
-                "from": "human",
-                "value": "Please help me solve this problem step by step."
-            },
-            {
-                "from": "assistant",
-                "value": "I'll help you solve this problem systematically."
-            }
-        ]
-    }
-]
-EOF
+# Build a small training file from the hidden-state dataset so ids line up with
+# core_training.HiddenStateLoader and the expected 4-turn conversation shape.
+python - "$HIDDEN_DATA_DIR" "$TRAINING_DATA" "$MAX_SAMPLES" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+from datasets import load_dataset, load_from_disk
+
+hidden_dir = Path(sys.argv[1])
+output_path = Path(sys.argv[2])
+max_samples = int(sys.argv[3])
+
+if (hidden_dir / "hf_dataset").is_dir():
+    ds = load_from_disk(str(hidden_dir / "hf_dataset"))
+elif (hidden_dir / "dataset_info.json").exists() or (hidden_dir / "state.json").exists():
+    ds = load_from_disk(str(hidden_dir))
+elif (hidden_dir / "data.parquet").is_file():
+    ds = load_dataset("parquet", data_files=str(hidden_dir / "data.parquet"), split="train")
+elif (hidden_dir / "data_full.parquet").is_file():
+    ds = load_dataset("parquet", data_files=str(hidden_dir / "data_full.parquet"), split="train")
+else:
+    raise SystemExit(f"Cannot find a supported hidden-state dataset under {hidden_dir}")
+
+limit = len(ds) if max_samples < 0 else min(len(ds), max_samples)
+rows = []
+for row in ds.select(range(limit)):
+    task_id = str(row.get("task_id") or row.get("id") or len(rows))
+    task = str(row.get("task") or "Solve the task.")
+    plan = str(row.get("plan") or "Use the latent plan to solve the task.")
+    rows.append(
+        {
+            "id": task_id,
+            "conversations": [
+                {"from": "human", "value": "You are solving an interactive reasoning task."},
+                {"from": "gpt", "value": "I will use the latent communication to help solve it."},
+                {"from": "human", "value": task},
+                {"from": "gpt", "value": plan},
+            ],
+        }
+    )
+
+if not rows:
+    raise SystemExit("Hidden-state dataset is empty; cannot build training data.")
+
+output_path.write_text(json.dumps(rows, indent=2), encoding="utf-8")
+print(f"Wrote {len(rows)} training examples to {output_path}")
+PY
 
 print_success "Training data prepared"
 

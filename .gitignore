@@ -149,6 +149,10 @@ datasets/
 *.parquet
 *.arrow
 *.json
+!eval/alfworld/eval_agent/configs/**/*.json
+!eval/alfworld/eval_agent/prompt/icl_examples/**/*.json
+!examples/**/*.json
+!tests/**/*.json
 *.csv
 *.tsv
 *.h5

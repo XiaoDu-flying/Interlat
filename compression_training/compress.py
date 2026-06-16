@@ -41,7 +41,9 @@ import json
 import time
 import random
 import argparse
+import sys
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence
 
 import numpy as np
@@ -65,8 +67,17 @@ from transformers import (
 )
 from transformers.trainer_pt_utils import LabelSmoother
 
-from fastchat.model.model_adapter import get_model_adapter
-from fastchat.conversation import SeparatorStyle
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+_CORE_TRAINING_DIR = _REPO_ROOT / "core_training"
+if _CORE_TRAINING_DIR.is_dir() and str(_CORE_TRAINING_DIR) not in sys.path:
+    sys.path.insert(0, str(_CORE_TRAINING_DIR))
+
+try:
+    from core_training.fastchat.model.model_adapter import get_model_adapter
+    from core_training.fastchat.conversation import SeparatorStyle
+except ImportError:
+    from fastchat.model.model_adapter import get_model_adapter
+    from fastchat.conversation import SeparatorStyle
 
 # Import ModelWithInsertedHiddenState - adjust path based on your project structure
 try:
@@ -81,12 +92,20 @@ except ImportError:
         sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'core_training', 'hidden_model'))
         from custom_model import ModelWithInsertedHiddenState
 
-from callbacks import (
-    PreCreateCkptDirCallback,
-    ParamChangeTrackerCallback,
-    EarlyStoppingStatusCallback,
-    PrintMetricsCallback,
-)
+try:
+    from .callbacks import (
+        PreCreateCkptDirCallback,
+        ParamChangeTrackerCallback,
+        EarlyStoppingStatusCallback,
+        PrintMetricsCallback,
+    )
+except ImportError:
+    from callbacks import (
+        PreCreateCkptDirCallback,
+        ParamChangeTrackerCallback,
+        EarlyStoppingStatusCallback,
+        PrintMetricsCallback,
+    )
 
 
 # =========================
@@ -541,7 +560,20 @@ class HiddenStateLoader:
 
     def _load_data(self):
         rank0_print(f"Loading tensor data from {self.dataset_name}")
-        ds = datasets.load_dataset(self.dataset_name, split=datasets.Split.TRAIN)
+        dataset_path = Path(self.dataset_name)
+        if dataset_path.exists():
+            if (dataset_path / "dataset_info.json").exists() or (dataset_path / "state.json").exists():
+                ds = datasets.load_from_disk(str(dataset_path))
+            elif (dataset_path / "hf_dataset").is_dir():
+                ds = datasets.load_from_disk(str(dataset_path / "hf_dataset"))
+            elif (dataset_path / "data.parquet").is_file():
+                ds = datasets.load_dataset("parquet", data_files=str(dataset_path / "data.parquet"), split="train")
+            elif (dataset_path / "data_full.parquet").is_file():
+                ds = datasets.load_dataset("parquet", data_files=str(dataset_path / "data_full.parquet"), split="train")
+            else:
+                ds = datasets.load_dataset(str(dataset_path), split=datasets.Split.TRAIN)
+        else:
+            ds = datasets.load_dataset(self.dataset_name, split=datasets.Split.TRAIN)
         rank0_print(f"Loaded {len(ds)} records.")
 
         with tqdm(total=1, desc="Converting Dataset to Pandas") as pbar:

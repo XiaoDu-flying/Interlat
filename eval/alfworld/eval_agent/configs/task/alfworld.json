@@ -1,0 +1,12 @@
+{
+  "env_config": {
+    "env_class": "AlfWorldEnv",
+    "instruction_path": "eval/alfworld/eval_agent/prompt/instructions/alfworld_inst.txt",
+    "icl_path": "eval/alfworld/eval_agent/prompt/icl_examples/alfworld_empty.json",
+    "icl_format": "first",
+    "max_steps": 50
+  },
+  "task": {
+    "task_class": "AlfWorldTask"
+  }
+}

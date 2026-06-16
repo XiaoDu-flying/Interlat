@@ -3,10 +3,10 @@ import json
 import logging
 import pathlib
 import argparse
+import sys
 from typing import Dict, Any
 from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
-from fastchat.model.model_adapter import get_conversation_template
 from colorama import Fore
 import torch
 import datasets
@@ -15,6 +15,17 @@ import numpy as np
 import math
 import re
 import csv
+
+_EVAL_AGENT_DIR = pathlib.Path(__file__).resolve().parent
+_REPO_ROOT = _EVAL_AGENT_DIR.parents[2]
+_CORE_TRAINING_DIR = _REPO_ROOT / "core_training"
+if _CORE_TRAINING_DIR.is_dir() and str(_CORE_TRAINING_DIR) not in sys.path:
+    sys.path.insert(0, str(_CORE_TRAINING_DIR))
+
+try:
+    from core_training.fastchat.model.model_adapter import get_conversation_template
+except ImportError:
+    from fastchat.model.model_adapter import get_conversation_template
 
 import tasks as tasks
 import agents as agents
@@ -681,7 +692,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--exp_path",
         type=str,
-        default="Interlat_preview/eval/alfworld/eval_agent/configs/task",
+        default=str(_EVAL_AGENT_DIR / "configs" / "task"),
         help="Config path of experiment.",
     )
     parser.add_argument(
@@ -711,7 +722,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--agent_path",
         type=str,
-        default="Interlat_preview/eval/alfworld/eval_agent/configs/model",
+        default=str(_EVAL_AGENT_DIR / "configs" / "model"),
         help="Config path of model.",
     )
     parser.add_argument(
@@ -756,13 +767,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model_key",
         type=str,
-        default="qwen7b",
+        default=None,
         help="Key to select model from predefined configs (e.g., 'qwen7b_base_v1')."
     )
     parser.add_argument(
         "--model_path",
         type=str,
-        default='/path/to/your/trained/model',
+        default=None,
         help="Direct path to model directory."
     )
     parser.add_argument(

@@ -5,8 +5,9 @@ import numpy as np
 import pandas as pd
 import torch
 import datasets
-from datasets import load_dataset, Split
+from datasets import load_dataset, load_from_disk, Split
 from tqdm import tqdm
+from pathlib import Path
 
 class HiddenStateLoader:
     def __init__(self, dataset_name):
@@ -18,7 +19,20 @@ class HiddenStateLoader:
 
     def _load_data(self):
         print(f"Loading tensor data from {self.dataset_name}")
-        self.dataset = datasets.load_dataset(self.dataset_name, split=datasets.Split.TRAIN)
+        dataset_path = Path(self.dataset_name)
+        if dataset_path.exists():
+            if (dataset_path / "dataset_info.json").exists() or (dataset_path / "state.json").exists():
+                self.dataset = load_from_disk(str(dataset_path))
+            elif (dataset_path / "hf_dataset").is_dir():
+                self.dataset = load_from_disk(str(dataset_path / "hf_dataset"))
+            elif (dataset_path / "data.parquet").is_file():
+                self.dataset = load_dataset("parquet", data_files=str(dataset_path / "data.parquet"), split="train")
+            elif (dataset_path / "data_full.parquet").is_file():
+                self.dataset = load_dataset("parquet", data_files=str(dataset_path / "data_full.parquet"), split="train")
+            else:
+                self.dataset = datasets.load_dataset(str(dataset_path), split=datasets.Split.TRAIN)
+        else:
+            self.dataset = datasets.load_dataset(self.dataset_name, split=datasets.Split.TRAIN)
 
         print(f"Loaded {len(self.dataset)} records.")
 

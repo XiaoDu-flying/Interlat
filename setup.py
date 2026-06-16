@@ -22,7 +22,18 @@ setup(
     long_description=read_readme(),
     long_description_content_type="text/markdown",
     url="https://github.com/XiaoDu-flying/Interlat",
-    packages=find_packages(),
+    packages=find_packages(
+        include=[
+            "compression_training",
+            "compression_training.*",
+            "core_training",
+            "core_training.*",
+            "data_collection",
+            "data_collection.*",
+            "eval",
+            "eval.*",
+        ]
+    ),
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
@@ -62,9 +73,12 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "hst-collect=data_collection.main:main",
-            "hst-train=core_training.train:main",
-            "hst-setup=scripts.setup:main",
+            "hst-collect=data_collection.collect_data:main",
+            "hst-train=core_training.train:train",
+            "hst-compress=compression_training.compress:main",
+            "interlat-collect=data_collection.collect_data:main",
+            "interlat-train=core_training.train:train",
+            "interlat-compress=compression_training.compress:main",
         ],
     },
     include_package_data=True,

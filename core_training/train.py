@@ -43,8 +43,6 @@ import matplotlib.pyplot as plt
 import torch.distributed as dist
 from contextlib import suppress
 
-from fastchat.conversation import SeparatorStyle
-from fastchat.model.model_adapter import get_conversation_template, get_model_adapter
 import random
 import time
 from tqdm import tqdm
@@ -53,18 +51,34 @@ import string
 import pyarrow as pa
 import datasets
 
-from arguments import ModelArguments, DataArguments, TrainingArguments
-from callbacks import (
-    OptimizerDebugCallback,
-    ParameterChangeCallback,
-    SaveMHAStateCallback,
-    EvalReportCallback,
-    GradientLoggingCallback,
-    LossRecorderCallback
-)
-
-from hidden_model.custom_model import ModelWithInsertedHiddenState
-from data_processor import make_supervised_data_module
+try:
+    from .fastchat.conversation import SeparatorStyle
+    from .fastchat.model.model_adapter import get_conversation_template, get_model_adapter
+    from .arguments import ModelArguments, DataArguments, TrainingArguments
+    from .callbacks import (
+        OptimizerDebugCallback,
+        ParameterChangeCallback,
+        SaveMHAStateCallback,
+        EvalReportCallback,
+        GradientLoggingCallback,
+        LossRecorderCallback,
+    )
+    from .hidden_model.custom_model import ModelWithInsertedHiddenState
+    from .data_processor import make_supervised_data_module
+except ImportError:
+    from fastchat.conversation import SeparatorStyle
+    from fastchat.model.model_adapter import get_conversation_template, get_model_adapter
+    from arguments import ModelArguments, DataArguments, TrainingArguments
+    from callbacks import (
+        OptimizerDebugCallback,
+        ParameterChangeCallback,
+        SaveMHAStateCallback,
+        EvalReportCallback,
+        GradientLoggingCallback,
+        LossRecorderCallback,
+    )
+    from hidden_model.custom_model import ModelWithInsertedHiddenState
+    from data_processor import make_supervised_data_module
 
 # Optional: if you have a Hugging Face token, you can set it here (not required)
 # os.environ["HF_TOKEN"] = "your_hf_token_here"

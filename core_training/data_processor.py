@@ -9,10 +9,14 @@ import transformers
 from transformers import PreTrainedTokenizer
 from transformers.trainer_pt_utils import LabelSmoother
 
-from hidden_state_loader import HiddenStateLoader
-
-from fastchat.conversation import SeparatorStyle
-from fastchat.model.model_adapter import get_conversation_template, get_model_adapter
+try:
+    from .hidden_state_loader import HiddenStateLoader
+    from .fastchat.conversation import SeparatorStyle
+    from .fastchat.model.model_adapter import get_conversation_template, get_model_adapter
+except ImportError:
+    from hidden_state_loader import HiddenStateLoader
+    from fastchat.conversation import SeparatorStyle
+    from fastchat.model.model_adapter import get_conversation_template, get_model_adapter
 
 IGNORE_TOKEN_ID = LabelSmoother.ignore_index
 
@@ -537,13 +541,16 @@ def make_supervised_data_module(
     # Handle training data
     if data_args.data_path:
         train_json = json.load(open(data_args.data_path, "r"))
-        # train_json = train_json[:50]
         print(f"data_args.data_path: {data_args.data_path}")
         for item in train_json:
-            merged_value = item['conversations'][0]['value'] + '\n' + item['conversations'][2]['value']
+            conversations = item['conversations']
+            if len(conversations) > 2:
+                merged_value = conversations[0]['value'] + '\n' + conversations[2]['value']
+            else:
+                merged_value = conversations[0]['value']
             new_first_entry = {'from': 'human', 'value': merged_value}
             new_first_entry['value'] += '\n' + 'Now, you are given a step-by-step plan to complete this task as follow: '
-            item['conversations'][0] = new_first_entry
+            conversations[0] = new_first_entry
 
             hidden_state, plan = loader_train.get_hidden_state_and_plan(item['id'])
             hidden_length = hidden_state.shape[0]
@@ -553,8 +560,9 @@ def make_supervised_data_module(
             item['hidden_state'] = hidden_state
             item['plan'] = plan
 
-            # Remove the second entry (original first gpt response)
-            del item['conversations'][1:3]
+            if len(conversations) > 2:
+                # Remove the intermediate exchange after merging its task text.
+                del conversations[1:3]
 
     # === New: split validation set from training set if eval_data_path not provided ===
     if data_args.eval_data_path is None:
