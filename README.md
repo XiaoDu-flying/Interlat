@@ -403,7 +403,7 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 - 🐛 **Bug Reports**: [GitHub Issues](https://github.com/XiaoDu-flying/Interlat/issues)
 - 💬 **Discussions**: [GitHub Discussions](https://github.com/XiaoDu-flying/Interlat/discussions)
-- 📧 **Email**: duzy@zju.edu.com
+- 📧 **Email**: duzy@zju.edu.cn
 
 ---
 
